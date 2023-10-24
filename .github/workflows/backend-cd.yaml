@@ -88,8 +88,7 @@ jobs:
         tags: ${{env.REPO}}:${{github.sha}}
     - name: Install kubectl
       uses: azure/setup-kubectl@v3
-      with:
-        version: '1.25'
+      
     - uses: imranismail/setup-kustomize@v2
     - name: Deploy
       run: |

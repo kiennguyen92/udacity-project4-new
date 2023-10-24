@@ -94,8 +94,7 @@ jobs:
         build-args: REACT_APP_MOVIE_API_URL=${{env.REACT_APP_MOVIE_API_URL}}
     - name: Install kubectl
       uses: azure/setup-kubectl@v3
-      with:
-        version: '1.25'
+      
     - uses: imranismail/setup-kustomize@v2
     - name: Deploy
       run: |
