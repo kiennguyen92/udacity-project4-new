@@ -1,7 +1,7 @@
-name: Frontend Continuous Integration
+name: Frontend Continuous Deployment
 
 on:
-  pull_request:
+  push:
     branches:    
       - main
   workflow_dispatch:
@@ -9,6 +9,8 @@ on:
 env: 
   NODE_VERSION: 18
   WORK_DIR: starter/frontend
+  REPO: 330073786310.dkr.ecr.us-east-1.amazonaws.com/frontend
+  REACT_APP_MOVIE_API_URL: project4.io
 
 jobs:
   lint:
@@ -72,8 +74,32 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-      # Build
-    - name: Build 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+      
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Docker build
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        context: ${{ env.WORK_DIR }}
+        tags: ${{env.REPO}}:${{github.sha}}
+        build-args: REACT_APP_MOVIE_API_URL=${{env.REACT_APP_MOVIE_API_URL}}
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: '1.25'
+    - uses: imranismail/setup-kustomize@v2
+    - name: Deploy
       run: |
-        cd ${{ env.WORK_DIR }}
-        docker build -f Dockerfile .
+        cd "${{ env.WORK_DIR }}/k8s"
+        aws eks update-kubeconfig --name cluster
+        kustomize edit set image frontend=${{env.REPO}}:${{github.sha}}
+        kustomize build | kubectl apply -f -
