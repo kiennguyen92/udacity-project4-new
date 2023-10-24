@@ -67,10 +67,6 @@ jobs:
       # Checkout code
     - name: Checkout
       uses: actions/checkout@v4
-
-    - name: Change to work directory
-      run: cd ${{ env.WORK_DIR }}
-
       # Build
     - name: Build 
-      run: docker build -f Dockerfile .
+      run: cd ${{ env.WORK_DIR }} && docker build -f Dockerfile .

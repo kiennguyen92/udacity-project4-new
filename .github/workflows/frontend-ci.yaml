@@ -1,7 +1,7 @@
 name: Frontend Continuous Integration
 
 on:
-  # push:
+  # pull_request:
   #   branches:    
   #     - main
   workflow_dispatch:
@@ -71,9 +71,6 @@ jobs:
       # Checkout code
     - name: Checkout
       uses: actions/checkout@v4
-
-    - name: Change to work directory
-      run: cd ${{ env.WORK_DIR }}
 
       # Build
     - name: Build 
