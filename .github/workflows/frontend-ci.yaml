@@ -58,9 +58,8 @@ jobs:
 
       # Test
     - name: Test
-      run: |
-        cd ${{ env.WORK_DIR }} 
-        npm run test
+      run: 
+        cd ${{ env.WORK_DIR }} && npm run test
 
   build:
     runs-on: ubuntu-latest
