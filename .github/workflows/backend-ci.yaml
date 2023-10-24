@@ -1,0 +1,76 @@
+name: Backend Continuous Integration
+on:
+  push:
+    branches:    
+      - main
+  workflow_dispatch:
+
+env: 
+  WORK_DIR: starter/backend
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps: 
+
+      # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v4
+
+      # Setup NodeJS
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+      
+      # Install dependencies
+    - name: Install pipenv
+      run: cd ${{ env.WORK_DIR }} && pip install pipenv
+
+    - name: Install package
+      run: cd ${{ env.WORK_DIR }} && pipenv install --dev
+      
+      # Lint
+    - name: Lint
+      run: cd ${{ env.WORK_DIR }} && pipenv run lint
+  
+  test:
+    runs-on: ubuntu-latest
+    steps: 
+
+      # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v4
+
+      # Setup Python
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+      
+      # Install dependencies
+    - name: Install pipenv
+      run: cd ${{ env.WORK_DIR }} && pip install pipenv
+
+    - name: Install package
+      run: cd ${{ env.WORK_DIR }} && pipenv install --dev
+      
+      # Test
+    - name: Test
+      run: cd ${{ env.WORK_DIR }} && pipenv run test
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+    - lint
+    - test
+    steps: 
+
+      # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Change to work directory
+      run: cd ${{ env.WORK_DIR }}
+
+      # Build
+    - name: Build 
+      run: docker build -f Dockerfile .
